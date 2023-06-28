@@ -1,2 +1,7 @@
-# backstage-demo
-A Backstage playground 
+# A Backstage playground 
+
+
+
+```
+npx @backstage/create-app@latest
+```
