@@ -1,0 +1,64 @@
+# Defining a System
+apiVersion: backstage.io/v1alpha1 # Kubernetes style manifests
+kind: System
+metadata: # Providing context
+  name: audio-playback
+  description: Audio playback system
+spec: # Defining relations
+  owner: team-c
+  domain: playback
+---
+# Defining a Resource
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata: # Providing context
+  name: audio-playback-db
+  description: Stores playback details
+spec: # Defining relations
+  type: database
+  owner: team-c
+  system: audio-playback
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: playback-order-api
+  description: Retrieve playback details
+spec:
+  type: openapi
+  lifecycle: production
+  owner: team-c
+  system: audio-playback
+  definition: |
+    openapi: "3.0.0"
+    info:
+      version: 1.0.0
+      title: Artist API
+      license:
+        name: MIT
+    servers:
+      - url: http://playback.spotify.net/v1
+    paths:
+      /start:
+        get:
+          summary: Provide the tune to play
+    ...
+---
+# Defining a Component
+apiVersion: backstage.io/v1alpha1 # Kubernetes style manifests
+kind: Component
+metadata: # Providing context
+  name: playback-order
+  description: Playback Order
+  tags:
+    - java
+    - playback
+spec: # Defining relations
+  type: service
+  lifecycle: production
+  owner: team-c # Defining ownership
+  system: audio-playback # Defining the service relationship
+  dependsOn:
+    - resource:default/audio-playback-db
+  providesApis:
+    - playback-order-api
